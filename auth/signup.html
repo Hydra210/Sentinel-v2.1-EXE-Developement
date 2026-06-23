@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create EXE Account — EXE Development</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=Outfit:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #080808; --surface: rgba(22,22,22,0.90); --surface2: rgba(30,30,30,0.72);
+    --border: rgba(255,255,255,0.09); --border-bright: rgba(255,255,255,0.22);
+    --accent: #ffffff; --red: #ff3b3b;
+    --text: #e8e8e8; --text-dim: rgba(232,232,232,0.52); --text-dimmer: rgba(232,232,232,0.28);
+    --font-mono: 'DM Mono', monospace; --font-ui: 'Outfit', sans-serif; --font-display: 'Syne', sans-serif;
+  }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-ui); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; }
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 9999; opacity: 0.35;
+  }
+
+  .grid-bg {
+    position: fixed; inset: 0;
+    background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 20%, transparent 80%);
+    pointer-events: none;
+  }
+
+  .auth-wrap { width: 100%; max-width: 420px; position: relative; z-index: 1; }
+
+  .auth-brand { text-align: center; margin-bottom: 36px; }
+  .auth-brand a { text-decoration: none; display: inline-flex; align-items: center; gap: 10px; }
+  .brand-icon {
+    width: 40px; height: 40px; border: 1px solid rgba(255,255,255,0.18);
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 10px; background: rgba(255,255,255,0.05);
+  }
+  .brand-icon svg { width: 20px; height: 20px; }
+  .brand-name { font-family: var(--font-display); font-size: 22px; font-weight: 800; letter-spacing: 4px; color: #fff; }
+
+  .auth-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 36px; backdrop-filter: blur(24px);
+  }
+
+  .auth-card h1 { font-family: var(--font-display); font-size: 22px; font-weight: 800; color: #fff; margin-bottom: 6px; letter-spacing: -0.5px; }
+  .auth-card .auth-sub { font-size: 14px; color: var(--text-dim); margin-bottom: 28px; }
+
+  .field { margin-bottom: 18px; }
+  .field label { display: block; font-family: var(--font-mono); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dimmer); margin-bottom: 8px; }
+  .field input {
+    width: 100%; background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+    color: var(--text); padding: 11px 14px; font-family: var(--font-mono); font-size: 13px;
+    border-radius: 8px; outline: none; transition: all 0.2s;
+  }
+  .field input:focus { border-color: rgba(255,255,255,0.28); background: rgba(255,255,255,0.07); }
+  .field input::placeholder { color: var(--text-dimmer); }
+
+  .btn-submit {
+    width: 100%; padding: 13px; font-family: var(--font-display); font-size: 13px;
+    font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    background: #fff; color: #000; border: none; border-radius: 8px;
+    cursor: pointer; transition: all 0.2s; margin-top: 8px;
+  }
+  .btn-submit:hover { background: rgba(255,255,255,0.88); }
+
+  .auth-divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; }
+  .auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .auth-divider span { font-family: var(--font-mono); font-size: 10px; color: var(--text-dimmer); letter-spacing: 1px; }
+
+  .auth-switch { text-align: center; font-size: 13px; color: var(--text-dim); }
+  .auth-switch a { color: #fff; text-decoration: none; font-weight: 600; }
+  .auth-switch a:hover { text-decoration: underline; }
+
+  .plan-notice {
+    background: rgba(255,59,59,0.07); border: 1px solid rgba(255,59,59,0.2);
+    border-radius: 8px; padding: 12px 14px; margin-top: 20px;
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: 1px;
+    color: rgba(255,107,107,0.85); line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="auth-wrap">
+  <div class="auth-brand">
+    <a href="../index.html">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round">
+          <polygon points="12,2 22,8.5 22,15.5 12,22 2,15.5 2,8.5"/>
+          <line x1="12" y1="2" x2="12" y2="22"/>
+          <line x1="2" y1="8.5" x2="22" y2="8.5"/>
+        </svg>
+      </div>
+      <span class="brand-name">EXE</span>
+    </a>
+  </div>
+
+  <div class="auth-card">
+    <h1>Create your EXE account</h1>
+    <p class="auth-sub">One account for all EXE products, including Sentinel.</p>
+
+    <div class="field">
+      <label>Username</label>
+      <input type="text" placeholder="your_username" id="signup-username">
+    </div>
+    <div class="field">
+      <label>Email address</label>
+      <input type="text" placeholder="you@example.com" id="signup-email">
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" placeholder="••••••••" id="signup-password">
+    </div>
+    <div class="field">
+      <label>Confirm password</label>
+      <input type="password" placeholder="••••••••" id="signup-confirm">
+    </div>
+
+    <button class="btn-submit" onclick="doSignup()">Create account</button>
+
+    <div class="plan-notice">
+      After creating your account, you'll choose a Sentinel plan. Sentinel is a paid product — no free tier.
+    </div>
+
+    <div class="auth-divider"><span>or</span></div>
+    <div class="auth-switch">Already have an EXE account? <a href="login.html">Sign in</a></div>
+  </div>
+</div>
+
+<script>
+function doSignup() {
+  const u = document.getElementById('signup-username').value.trim();
+  const e = document.getElementById('signup-email').value.trim();
+  const p = document.getElementById('signup-password').value;
+  if (!u || !e || !p) { alert('Please fill in all fields.'); return; }
+  // Mock: store session, then redirect to EXE homepage
+  // If they came here to get Sentinel, the pending plan is in sessionStorage
+  sessionStorage.setItem('exe_user', JSON.stringify({ username: u, email: e, plan: null }));
+  const pending = sessionStorage.getItem('pending_plan');
+  if (pending) {
+    // They came from a plan selection — send them to pick their plan
+    window.location.href = '../sentinel/plans.html?new=1';
+  } else {
+    // Normal signup — send them home
+    window.location.href = '../index.html';
+  }
+}
+</script>
+</body>
+</html>
