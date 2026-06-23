@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact — EXE Development</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=Outfit:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #080808; --surface: rgba(22,22,22,0.88); --border: rgba(255,255,255,0.09); --border-bright: rgba(255,255,255,0.22);
+    --text: #e8e8e8; --text-dim: rgba(232,232,232,0.52); --text-dimmer: rgba(232,232,232,0.28);
+    --font-mono: 'DM Mono', monospace; --font-ui: 'Outfit', sans-serif; --font-display: 'Syne', sans-serif;
+  }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-ui); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 60px 24px; }
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 9999; opacity: 0.35;
+  }
+  .wrap { max-width: 560px; width: 100%; position: relative; z-index: 1; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dimmer); text-decoration: none; margin-bottom: 36px; transition: color 0.2s; }
+  .back:hover { color: var(--text-dim); }
+  h1 { font-family: var(--font-display); font-size: 36px; font-weight: 800; letter-spacing: -1px; color: #fff; margin-bottom: 8px; }
+  .sub { font-size: 15px; color: var(--text-dim); margin-bottom: 36px; line-height: 1.6; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 36px; backdrop-filter: blur(24px); }
+  .field { margin-bottom: 18px; }
+  .field label { display: block; font-family: var(--font-mono); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dimmer); margin-bottom: 8px; }
+  .field input, .field textarea, .field select {
+    width: 100%; background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+    color: var(--text); padding: 10px 14px; font-family: var(--font-mono); font-size: 12px;
+    border-radius: 8px; outline: none; transition: all 0.2s; appearance: none;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus { border-color: rgba(255,255,255,0.28); background: rgba(255,255,255,0.07); }
+  .field input::placeholder, .field textarea::placeholder { color: var(--text-dimmer); }
+  .field textarea { resize: vertical; min-height: 110px; line-height: 1.6; }
+  .field select option { background: #1e1e1e; }
+  .btn-submit { width: 100%; padding: 13px; font-family: var(--font-display); font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; background: #fff; color: #000; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s; margin-top: 4px; }
+  .btn-submit:hover { background: rgba(255,255,255,0.88); }
+  .success-msg { display: none; text-align: center; padding: 20px 0; }
+  .success-msg h2 { font-family: var(--font-display); font-size: 22px; font-weight: 800; color: #fff; margin-bottom: 8px; }
+  .success-msg p { font-size: 14px; color: var(--text-dim); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a href="../index.html" class="back">← EXE Development</a>
+  <h1>Contact us</h1>
+  <p class="sub">Questions about Sentinel, your EXE account, or billing? Fill out the form below and we'll get back to you.</p>
+  <div class="card">
+    <div id="contact-form">
+      <div class="field">
+        <label>Your name</label>
+        <input type="text" id="c-name" placeholder="Name">
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="text" id="c-email" placeholder="you@example.com">
+      </div>
+      <div class="field">
+        <label>Topic</label>
+        <select id="c-topic">
+          <option value="">Select a topic…</option>
+          <option>Sentinel — Billing</option>
+          <option>Sentinel — Technical issue</option>
+          <option>EXE Account</option>
+          <option>Partnership / Error Dev Group</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Message</label>
+        <textarea id="c-msg" placeholder="Describe your issue or question…"></textarea>
+      </div>
+      <button class="btn-submit" onclick="submitContact()">Send message</button>
+    </div>
+    <div class="success-msg" id="success-msg">
+      <div style="font-size:32px;margin-bottom:16px;">✓</div>
+      <h2>Message sent</h2>
+      <p>We'll respond to your EXE account email within 1–2 business days.</p>
+    </div>
+  </div>
+</div>
+<script>
+function submitContact() {
+  const n = document.getElementById('c-name').value.trim();
+  const e = document.getElementById('c-email').value.trim();
+  const t = document.getElementById('c-topic').value;
+  const m = document.getElementById('c-msg').value.trim();
+  if (!n || !e || !t || !m) { alert('Please fill in all fields.'); return; }
+  document.getElementById('contact-form').style.display = 'none';
+  document.getElementById('success-msg').style.display = 'block';
+}
+</script>
+</body>
+</html>
